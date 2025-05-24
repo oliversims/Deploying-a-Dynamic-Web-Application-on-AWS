@@ -105,7 +105,7 @@ flyway -url="jdbc:mysql://$RDS_ENDPOINT:3306/$RDS_DB_NAME?useSSL=true&trustServe
 
 echo "Migration complete!"
 
-Web Application Deployment Script (EC2)
+## Web Application Deployment Script (EC2)
 
 This script provisions the web server, installs dependencies, and deploys the application code from S3:
 
