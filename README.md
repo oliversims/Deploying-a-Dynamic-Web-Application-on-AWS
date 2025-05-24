@@ -108,10 +108,10 @@ echo "Migration complete!"
 ---
 
 ## Web Application Deployment Script (EC2)
+
 This script provisions the web server, installs dependencies, and deploys the application code from S3:
 
-bash
-Copy Code
+```bash
 #!/bin/bash
 
 # Update all packages
@@ -175,6 +175,9 @@ sudo vi .env
 
 # Restart Apache
 sudo service httpd restart
+
+---
+
 Issue Encountered and Solution
 Issue
 When running the Flyway migration script, the following error occurred:
