@@ -1,5 +1,3 @@
-Absolutely! Here’s your improved README.md in Markdown, with the requested section titles and all content clearly organized:
-
 # Dynamic Website Hosting on AWS – DevOps Project
 
 ## Overview
@@ -106,11 +104,11 @@ flyway -url="jdbc:mysql://$RDS_ENDPOINT:3306/$RDS_DB_NAME?useSSL=true&trustServe
   migrate
 
 echo "Migration complete!"
-
 Web Application Deployment Script (EC2)
-
 This script provisions the web server, installs dependencies, and deploys the application code from S3:
 
+bash
+Copy Code
 #!/bin/bash
 
 # Update all packages
@@ -174,44 +172,28 @@ sudo vi .env
 
 # Restart Apache
 sudo service httpd restart
-
 Issue Encountered and Solution
 Issue
-
 When running the Flyway migration script, the following error occurred:
 
 PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
-
-
 This error means Java (used by Flyway) did not trust the SSL certificate presented by the AWS RDS MySQL instance.
 Additionally, permission errors occurred due to files and directories created by sudo in previous runs.
 
 Solution
-
 Cleaned Up Old Files:
 The script was updated to remove any existing Flyway directories, symlinks, and the sql directory before running, ensuring no permission conflicts.
-
 Fixed Permissions:
 All new files and directories are created by the current user, not root, to avoid permission issues.
-
 Bypassed SSL Validation:
 The JDBC URL in the Flyway command was updated to include trustServerCertificate=true, which tells the MySQL driver to accept the server’s certificate without validation.
-
 Note: This is suitable for development and testing. For production, import the AWS RDS root CA certificate into the Java keystore.
 
 Ensured Java Installation:
 The script checks for Java and installs it if missing, ensuring Flyway can run.
-
 References
 AWS RDS SSL Documentation
 Flyway Documentation
 AWS EC2 User Guide
 License
-
 This project is for educational and demonstration purposes.
-
-
----
-
-You can copy and use this as your `README.md`.  
-Let me know if you need any more adjustments!
