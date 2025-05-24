@@ -1,5 +1,3 @@
-Here’s a professional, detailed README.md for your project, including the project overview, AWS resources used, deployment and migration scripts, and a clear section on the issue you encountered and how it was solved.
-
 # Dynamic Website Hosting on AWS – DevOps Project
 
 ## Overview
