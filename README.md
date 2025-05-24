@@ -1,3 +1,121 @@
+You are absolutely right! My apologies. I missed that detail.
+
+To make "Web Application Deployment Script (EC2)" a big title like "## Data Migration Script (RDS)", you need to use the ## Markdown syntax for a level 2 heading.
+
+Here's the corrected section:
+
+## Web Application Deployment Script (EC2)
+
+This script provisions the web server, installs dependencies, and deploys the application code from S3:
+
+```bash
+#!/bin/bash
+
+# Update all packages
+sudo yum update -y
+
+# Install Apache web server
+sudo yum install -y httpd
+sudo systemctl enable httpd
+sudo systemctl start httpd
+
+# Install PHP and required extensions
+sudo dnf install -y \
+php \
+php-pdo \
+php-openssl \
+php-mbstring \
+php-exif \
+php-fileinfo \
+php-xml \
+php-ctype \
+php-json \
+php-tokenizer \
+php-curl \
+php-cli \
+php-fpm \
+php-mysqlnd \
+php-bcmath \
+php-gd \
+php-cgi \
+php-gettext \
+php-intl \
+php-zip
+
+# Install MySQL 8
+sudo wget https://dev.mysql.com/get/mysql80-community-release-el9-1.noarch.rpm
+sudo dnf install -y mysql80-community-release-el9-1.noarch.rpm
+sudo rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
+dnf repolist enabled | grep "mysql.*-community.*"
+sudo dnf install -y mysql-community-server
+sudo systemctl start mysqld
+sudo systemctl enable mysqld
+
+# Enable mod_rewrite in Apache
+sudo sed -i '/<Directory "\/var\/www\/html">/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/httpd/conf/httpd.conf
+
+# Download application code from S3
+S3_BUCKET_NAME=oliver-project-web-files
+sudo aws s3 sync s3://"$S3_BUCKET_NAME" /var/www/html
+
+cd /var/www/html
+sudo unzip shopwise.zip
+sudo cp -R shopwise/. /var/www/html/
+sudo rm -rf shopwise shopwise.zip
+
+# Set permissions
+sudo chmod -R 777 /var/www/html
+sudo chmod -R 777 storage/
+
+# Edit .env for database credentials
+sudo vi .env
+
+# Restart Apache
+sudo service httpd restart
+
+
+And for the "Issue Encountered and Solution" and "References" sections, you wanted them as top-level titles, so they should be # (level 1 headings):
+
+# Issue Encountered and Solution
+
+## Issue
+
+When running the Flyway migration script, the following error occurred:
+
+
+
+PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+
+
+This error means Java (used by Flyway) did not trust the SSL certificate presented by the AWS RDS MySQL instance.  
+Additionally, permission errors occurred due to files and directories created by `sudo` in previous runs.
+
+## Solution
+
+1. **Cleaned Up Old Files:**  
+   The script was updated to remove any existing Flyway directories, symlinks, and the `sql` directory before running, ensuring no permission conflicts.
+
+2. **Fixed Permissions:**  
+   All new files and directories are created by the current user, not `root`, to avoid permission issues.
+
+3. **Bypassed SSL Validation:**  
+   The JDBC URL in the Flyway command was updated to include `trustServerCertificate=true`, which tells the MySQL driver to accept the server’s certificate without validation.  
+   > **Note:** This is suitable for development and testing. For production, import the AWS RDS root CA certificate into the Java keystore.
+
+4. **Ensured Java Installation:**  
+   The script checks for Java and installs it if missing, ensuring Flyway can run.
+
+---
+
+# References
+
+- [AWS RDS SSL Documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.SSL.html)
+- [Flyway Documentation](https://flywaydb.org/documentation/)
+- [AWS EC2 User Guide](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/)
+
+
+Here's the complete README.md content with these corrections:
+
 # Dynamic Website Hosting on AWS – DevOps Project
 
 ## Overview
@@ -105,13 +223,10 @@ flyway -url="jdbc:mysql://$RDS_ENDPOINT:3306/$RDS_DB_NAME?useSSL=true&trustServe
 
 echo "Migration complete!"
 
----
-
-## Web Application Deployment Script (EC2)
+Web Application Deployment Script (EC2)
 
 This script provisions the web server, installs dependencies, and deploys the application code from S3:
 
-```bash
 #!/bin/bash
 
 # Update all packages
@@ -176,30 +291,43 @@ sudo vi .env
 # Restart Apache
 sudo service httpd restart
 
----
-
 Issue Encountered and Solution
 Issue
+
 When running the Flyway migration script, the following error occurred:
 
 PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+
+
 This error means Java (used by Flyway) did not trust the SSL certificate presented by the AWS RDS MySQL instance.
 Additionally, permission errors occurred due to files and directories created by sudo in previous runs.
 
 Solution
+
 Cleaned Up Old Files:
 The script was updated to remove any existing Flyway directories, symlinks, and the sql directory before running, ensuring no permission conflicts.
+
 Fixed Permissions:
 All new files and directories are created by the current user, not root, to avoid permission issues.
+
 Bypassed SSL Validation:
 The JDBC URL in the Flyway command was updated to include trustServerCertificate=true, which tells the MySQL driver to accept the server’s certificate without validation.
+
 Note: This is suitable for development and testing. For production, import the AWS RDS root CA certificate into the Java keystore.
 
 Ensured Java Installation:
 The script checks for Java and installs it if missing, ensuring Flyway can run.
+
 References
 AWS RDS SSL Documentation
 Flyway Documentation
 AWS EC2 User Guide
 License
+
 This project is for educational and demonstration purposes.
+
+
+Now, when you paste this into your `README.md` file, "Web Application Deployment Script (EC2)", "Issue Encountered and Solution", and "References" will all be large, level 1 headings.
+
+Let me know if you need any further adjustments!
+
